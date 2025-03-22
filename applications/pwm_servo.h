@@ -81,5 +81,6 @@ void pwm_servo_set_position (PWMServoObjectTypeDef *self, uint32_t duty, uint32_
 void pwm_servo_set_offset(PWMServoObjectTypeDef *self, int offset);
 
 void pwm_servos_init(void);
+
 #endif
 

@@ -1,7 +1,6 @@
 #include "pwm_servo.h"
 #include <stdint.h>
 #include "main.h"
-#include "lwmem.h" // Include the header file where LWMEM_CCM_MALLOC is declared
 #include "tim.h"
 
 PWMServoObjectTypeDef *pwm_servos[4];
@@ -29,7 +28,8 @@ static void pwm_servo4_write_pin(uint32_t new_state)
 void pwm_servos_init(void)
 {
     for(int i = 0; i < 4; ++i) {
-        pwm_servos[i] = (PWMServoObjectTypeDef *)LWMEM_CCM_MALLOC(sizeof(PWMServoObjectTypeDef));
+        static PWMServoObjectTypeDef pwm_servo_objects[4];
+        pwm_servos[i] = &pwm_servo_objects[i];
         pwm_servo_object_init(pwm_servos[i]);  // 初始化PWM舵机对象内存
     }
     pwm_servos[0]->write_pin = pwm_servo1_write_pin;
@@ -37,10 +37,16 @@ void pwm_servos_init(void)
     pwm_servos[2]->write_pin = pwm_servo3_write_pin;
     pwm_servos[3]->write_pin = pwm_servo4_write_pin;
 
+    //计数值设置为0
     __HAL_TIM_SET_COUNTER(&htim13, 0);
+    //清除更新标志
     __HAL_TIM_CLEAR_FLAG(&htim13, TIM_FLAG_UPDATE);
+    //清除比较通道1标志
     __HAL_TIM_CLEAR_FLAG(&htim13, TIM_FLAG_CC1);
+    //开启中断
     __HAL_TIM_ENABLE_IT(&htim13, TIM_IT_UPDATE);
+    //开启比较通道1
     __HAL_TIM_ENABLE_IT(&htim13, TIM_IT_CC1);
+    //启用定时器13
     __HAL_TIM_ENABLE(&htim13);
 }

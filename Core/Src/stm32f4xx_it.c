@@ -22,6 +22,7 @@
 #include "stm32f4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "pwm_servo.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -57,6 +58,7 @@
 /* External variables --------------------------------------------------------*/
 extern DMA_HandleTypeDef hdma_i2c2_rx;
 extern DMA_HandleTypeDef hdma_i2c2_tx;
+extern TIM_HandleTypeDef htim13;
 extern DMA_HandleTypeDef hdma_usart2_rx;
 extern DMA_HandleTypeDef hdma_usart2_tx;
 extern UART_HandleTypeDef huart2;
@@ -218,6 +220,33 @@ void USART2_IRQHandler(void)
   /* USER CODE BEGIN USART2_IRQn 1 */
 
   /* USER CODE END USART2_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM8 update interrupt and TIM13 global interrupt.
+  */
+void TIM8_UP_TIM13_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM8_UP_TIM13_IRQn 0 */
+  //舵机中断回调
+  extern PWMServoObjectTypeDef *pwm_servos[4];
+  static uint32_t pwm_servo_index = 0;
+  if(__HAL_TIM_GET_FLAG(&htim13, TIM_FLAG_CC1) != RESET) {
+      __HAL_TIM_CLEAR_FLAG(&htim13, TIM_FLAG_CC1);
+      pwm_servos[pwm_servo_index]->write_pin(0);
+      pwm_servo_index = pwm_servo_index == 3 ? 0 : pwm_servo_index + 1;
+  }
+  if(__HAL_TIM_GET_FLAG(&htim13, TIM_FLAG_UPDATE) != RESET) {
+      __HAL_TIM_CLEAR_FLAG(&htim13, TIM_FLAG_UPDATE);
+      pwm_servos[pwm_servo_index]->write_pin(1);
+      pwm_servo_duty_compare(pwm_servos[pwm_servo_index]);
+      __HAL_TIM_SET_COMPARE(&htim13, TIM_CHANNEL_1, pwm_servos[pwm_servo_index]->duty_raw);
+  }
+  /* USER CODE END TIM8_UP_TIM13_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim13);
+  /* USER CODE BEGIN TIM8_UP_TIM13_IRQn 1 */
+
+  /* USER CODE END TIM8_UP_TIM13_IRQn 1 */
 }
 
 /**
