@@ -37,6 +37,9 @@ void pwm_servos_init(void)
     pwm_servos[2]->write_pin = pwm_servo3_write_pin;
     pwm_servos[3]->write_pin = pwm_servo4_write_pin;
 
+    /*
+    * @brief tim3为200Hz,5ms一个计数周期,时分复用法,轮流输出4个舵机pwm
+    */
     //计数值设置为0
     __HAL_TIM_SET_COUNTER(&htim13, 0);
     //清除更新标志
