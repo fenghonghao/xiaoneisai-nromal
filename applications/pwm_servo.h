@@ -30,7 +30,7 @@ typedef struct PWMServoObject  PWMServoObjectTypeDef;
  * @brief PWM舵机对象结构体
  */
 struct PWMServoObject {
-    int id;     /**< @brief 舵机ID */
+    // int id;     /**< @brief 舵机ID */
     int offset; /**< @brief 舵机偏差 */
     int target_duty;  /**< @brief 目标脉宽 */
     int current_duty; /**< @brief 当前脉宽 */
