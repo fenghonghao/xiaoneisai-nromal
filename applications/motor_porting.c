@@ -108,7 +108,7 @@ void motors_init(void)
     __HAL_TIM_CLEAR_IT(&htim3, TIM_IT_UPDATE);
     __HAL_TIM_ENABLE_IT(&htim3, TIM_IT_UPDATE);
     __HAL_TIM_ENABLE(&htim3);
-    HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_ALL);
+    HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
 
 
     // 测速更新定时器

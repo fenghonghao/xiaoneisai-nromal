@@ -46,6 +46,7 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 )
 
 aux_source_directory(./applications APPLICATION)
+aux_source_directory(./applications/USB_HOST APPLICATION)
 message("Applications: ${APPLICATION}")
 
 # Add sources to executable
@@ -58,6 +59,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
     applications
+    applications/USB_HOST
 )
 
 # Add project symbols (macros)
