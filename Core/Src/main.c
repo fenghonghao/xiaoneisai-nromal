@@ -50,7 +50,8 @@
 
 /* USER CODE BEGIN PV */
 extern uint8_t receiveBLEData[64];
-
+extern uint8_t receivePIData[64];
+extern osMessageQueueId_t moving_ctrl_queueHandle;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -58,6 +59,7 @@ void SystemClock_Config(void);
 void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
 extern void motors_init(void);
+extern void chassis_init(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -112,8 +114,11 @@ int main(void)
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_UARTEx_ReceiveToIdle_DMA(&huart2, receiveBLEData, sizeof(receiveBLEData));
+  HAL_UARTEx_ReceiveToIdle_DMA(&huart3, receivePIData, sizeof(receivePIData));
   pwm_servos_init();
   motors_init();
+  osMessageQueueReset(moving_ctrl_queueHandle); 
+  chassis_init();
   /* USER CODE END 2 */
 
   /* Init scheduler */

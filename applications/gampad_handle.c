@@ -3,7 +3,9 @@
 #include "usbh_hid.h"
 #include "usbh_hid_gamepad.h"
 #include "cmsis_os2.h"
-
+#include "string.h"
+#include "main.h"
+#include "usart.h"
 #define ATC_THRESHOLD 60
 
 static char A_T_C(int8_t analog_x, int8_t analog_y);
@@ -11,13 +13,14 @@ static char A_T_C(int8_t analog_x, int8_t analog_y);
 
 void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
 {
+    HAL_UART_Transmit_DMA(&huart2, "recivingmsg\r\n", 12); //debug打印
     extern osMessageQueueId_t moving_ctrl_queueHandle;
     static HID_GAMEPAD_Info_TypeDef last_info;
     static char last_direction_msg = 'I';
     static char last_button = 'R';
 
     switch(USBH_HID_GetDeviceType(phost)) {
-        case 0xFF: {/* 手柄数据 */
+        case 0x00: {/* 手柄数据 */
             HID_GAMEPAD_Info_TypeDef *info = USBH_HID_GetGamepadInfo(phost);
             if(info == NULL) {
                 break;

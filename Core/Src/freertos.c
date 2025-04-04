@@ -29,6 +29,7 @@
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
+typedef StaticTask_t osStaticThreadDef_t;
 typedef StaticQueue_t osStaticMessageQDef_t;
 /* USER CODE BEGIN PTD */
 
@@ -69,6 +70,18 @@ const osThreadAttr_t IMU_attributes = {
   .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityLow,
 };
+/* Definitions for app_task */
+osThreadId_t app_taskHandle;
+uint32_t app_taskBuffer[ 512 ];
+osStaticThreadDef_t app_taskControlBlock;
+const osThreadAttr_t app_task_attributes = {
+  .name = "app_task",
+  .cb_mem = &app_taskControlBlock,
+  .cb_size = sizeof(app_taskControlBlock),
+  .stack_mem = &app_taskBuffer[0],
+  .stack_size = sizeof(app_taskBuffer),
+  .priority = (osPriority_t) osPriorityNormal,
+};
 /* Definitions for moving_ctrl_queue */
 osMessageQueueId_t moving_ctrl_queueHandle;
 uint8_t moving_ctrl_queueBuffer[ 32 * sizeof( char ) ];
@@ -94,6 +107,7 @@ const osSemaphoreAttr_t IMU_data_ready_attributes = {
 void StartDefaultTask(void *argument);
 extern void led_task(void *argument);
 extern void IMU_task(void *argument);
+extern void app_task_entry(void *argument);
 
 extern void MX_USB_HOST_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -141,6 +155,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of IMU */
   IMUHandle = osThreadNew(IMU_task, NULL, &IMU_attributes);
+
+  /* creation of app_task */
+  app_taskHandle = osThreadNew(app_task_entry, NULL, &app_task_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
